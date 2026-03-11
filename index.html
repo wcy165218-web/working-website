@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福州渔博会补贴政策前后对比</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --table-border: #e0e0e0;
+            --increase: #d32f2f; /* 红色：支出增加 */
+            --decrease: #2e7d32; /* 绿色：支出减少 */
+            --bg-red: #ffebee;
+            --bg-green: #e8f5e9;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        h2, h3 { text-align: center; color: var(--primary); }
+        h3 { margin-top: 40px; border-left: 4px solid var(--accent); padding-left: 10px; text-align: left; }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            background: #f1f4f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .input-item { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; }
+
+        .checkbox-row {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px dashed var(--accent);
+            font-weight: bold;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            grid-column: 1 / -1;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #2980b9; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { border: 1px solid var(--table-border); padding: 12px; text-align: right; }
+        th { background: #f8f9fa; text-align: center; font-size: 14px; }
+        td:first-child { text-align: left; font-weight: 500; }
+
+        .row-group { background: #fffbf0; font-weight: bold; text-align: left; }
+        .final-row { background: #ebf5ff; font-weight: bold; }
+        
+        .diff-plus { color: var(--increase); font-weight: bold; }  
+        .diff-minus { color: var(--decrease); font-weight: bold; } 
+        
+        .summary-box {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .list-table th { background-color: var(--primary); color: white; }
+        .list-table tr:nth-child(even) { background-color: #fafafa; }
+        .win-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 5px; color: white; }
+        .tag-new { background-color: var(--decrease); }
+        .tag-old { background-color: var(--increase); }
+        .theme-highlight { color: #8e44ad; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>福州渔博会补贴政策前后对比</h2>
+    
+    <div class="input-grid">
+        <div class="input-item">
+            <label>展位费定价 (元/㎡)</label>
+            <input type="number" id="priceBooth" value="580">
+        </div>
+        <div class="input-item">
+            <label>搭建费定价 (元/㎡)</label>
+            <input type="number" id="priceConst" value="1000">
+        </div>
+        <div class="input-item">
+            <label>测算面积 (㎡)</label>
+            <input type="number" id="area" value="180">
+        </div>
+        <div class="input-item">
+            <label>活动额外支出 (元)</label>
+            <input type="number" id="themeCost" value="100000">
+        </div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="checkTheme" checked>
+            <label for="checkTheme" style="cursor:pointer;">此项测算包含【主题活动】 (需≥180㎡)</label>
+        </div>
+        <button onclick="runAnalysis()">立即开始政策对比</button>
+    </div>
+
+    <div id="resultContent" style="display:none;">
+        <h3>1. 费用与补贴拆解明细</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>项目明细</th>
+                    <th>原方案 (元)</th>
+                    <th>现方案 (元)</th>
+                    <th>差额 (现-原)</th>
+                </tr>
+            </thead>
+            <tbody id="detailBody"></tbody>
+        </table>
+        
+        <div id="verdict" class="summary-box"></div>
+
+        <h3>2. 不同面积梯度优势分析列表</h3>
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>展位面积</th>
+                    <th>总支出 (含活动)</th>
+                    <th>原方案总补贴</th>
+                    <th>现方案总补贴</th>
+                    <th>实际花费差异</th>
+                    <th>优势方案</th>
+                </tr>
+            </thead>
+            <tbody id="listBody"></tbody>
+        </table>
+        
+        <div style="margin-top:20px; padding:15px; border-radius:6px; background:#fdfaff; border:1px solid #e0d0f0; font-size:13px; color:#444;">
+            <strong>📝 政策核心差异摘要：</strong><br>
+            • <strong>基础补贴：</strong>原方案最高补10万（定额制），现方案最高补5万（比例制）。<br>
+            • <strong>主题活动：</strong>面积满180㎡举办活动，均可额外享受固定 <strong>100,000 元</strong> 补贴。<br>
+            • <strong>花费差异：</strong>计算公式为“现方案最终花费 - 原方案最终花费”。
+        </div>
+    </div>
+</div>
+
+<script>
+    function format(num) { return Math.round(num).toLocaleString('zh-CN'); }
+
+    function calculateData(pBooth, pConst, area, tCost, userWantsTheme) {
+        const costBaseTotal = (pBooth + pConst) * area;
+        const isEligible = (area >= 180 && userWantsTheme);
+        const actualTCost = isEligible ? tCost : 0;
+        const totalExp = costBaseTotal + actualTCost;
+
+        // 原方案
+        const subBaseOrig = Math.min((area / 9) * 2500 * 2, 100000); // 每9平补5000
+        const subThemeOrig = isEligible ? 100000 : 0;
+        const subTotalOrig = subBaseOrig + subThemeOrig;
+
+        // 现方案
+        const subBaseNew = Math.min(costBaseTotal * 0.5, 50000);
+        const subThemeNew = isEligible ? 100000 : 0; // 固定10万
+        const subTotalNew = subBaseNew + subThemeNew;
+
+        return {
+            isTheme: isEligible,
+            area,
+            costBooth: pBooth * area,
+            costConst: pConst * area,
+            actualTCost,
+            totalExp,
+            subBaseOrig,
+            subThemeOrig,
+            subTotalOrig,
+            subBaseNew,
+            subThemeNew,
+            subTotalNew,
+            finalOrig: totalExp - subTotalOrig,
+            finalNew: totalExp - subTotalNew
+        };
+    }
+
+    function runAnalysis() {
+        const pBooth = parseFloat(document.getElementById('priceBooth').value) || 0;
+        const pConst = parseFloat(document.getElementById('priceConst').value) || 0;
+        const curArea = parseFloat(document.getElementById('area').value) || 0;
+        const tCost = parseFloat(document.getElementById('themeCost').value) || 0;
+        const wantsTheme = document.getElementById('checkTheme').checked;
+
+        const d = calculateData(pBooth, pConst, curArea, tCost, wantsTheme);
+        
+        // 渲染明细
+        let detailHtml = `
+            <tr class="row-group"><td colspan="4">【成本支出】</td></tr>
+            <tr><td>展位费支出 (${d.area}㎡)</td><td>${format(d.costBooth)}</td><td>${format(d.costBooth)}</td><td>-</td></tr>
+            <tr><td>搭建费支出 (${d.area}㎡)</td><td>${format(d.costConst)}</td><td>${format(d.costConst)}</td><td>-</td></tr>
+            <tr><td>主题活动额外支出</td><td>${format(d.actualTCost)}</td><td>${format(d.actualTCost)}</td><td>-</td></tr>
+            <tr class="row-group"><td colspan="4">【补贴金额】</td></tr>
+            <tr><td>基础补贴 (展位+搭建)</td><td>${format(d.subBaseOrig)}</td><td>${format(d.subBaseNew)}</td><td class="${d.subBaseNew < d.subBaseOrig ? 'diff-plus':''}">${format(d.subBaseNew - d.subBaseOrig)}</td></tr>
+            <tr><td>主题活动补贴</td><td>${format(d.subThemeOrig)}</td><td>${format(d.subThemeNew)}</td><td>-</td></tr>
+            <tr class="final-row"><td>企业最终实付总额</td><td>${format(d.finalOrig)}</td><td>${format(d.finalNew)}</td><td class="${d.finalNew > d.finalOrig ? 'diff-plus':'diff-minus'}">${format(d.finalNew - d.finalOrig)}</td></tr>
+        `;
+        document.getElementById('detailBody').innerHTML = detailHtml;
+
+        // 渲染动态高亮提示框
+        const v = document.getElementById('verdict');
+        const diff = d.finalNew - d.finalOrig;
+        
+        if (diff > 0) {
+            // 原方案划算 (红色提示：支出更高)
+            v.style.background = "var(--bg-red)";
+            v.style.color = "var(--increase)";
+            v.style.border = "1px solid #ffcdd2";
+            v.innerHTML = `⚠️ 当前情景下：原方案更划算，现方案多出支出 ¥${format(diff)}`;
+        } else if (diff < 0) {
+            // 现方案划算 (绿色提示：支出更低)
+            v.style.background = "var(--bg-green)";
+            v.style.color = "var(--decrease)";
+            v.style.border = "1px solid #c8e6c9";
+            v.innerHTML = `✅ 当前情景下：现方案更划算，节省支出 ¥${format(Math.abs(diff))}`;
+        } else {
+            v.style.background = "#f5f5f5";
+            v.style.color = "#666";
+            v.style.border = "1px solid #ddd";
+            v.innerHTML = "当前情景下：两种方案支出一致";
+        }
+
+        // 渲染列表
+        const configs = [
+            {a: 36, t: false}, {a: 54, t: false}, {a: 72, t: false}, 
+            {a: 81, t: false}, {a: 90, t: false}, {a: 108, t: false}, 
+            {a: 135, t: false}, {a: 180, t: false}, {a: 180, t: true}
+        ];
+        
+        let listHtml = "";
+        configs.forEach(c => {
+            const res = calculateData(pBooth, pConst, c.a, tCost, c.t);
+            const totalDiff = res.finalNew - res.finalOrig;
+            const advantage = totalDiff < 0 ? '<span class="win-tag tag-new">现方案占优</span>' : (totalDiff > 0 ? '<span class="win-tag tag-old">原方案占优</span>' : '<span class="win-tag" style="background:#95a5a6">无差异</span>');
+            const label = c.t ? `<span class="theme-highlight">${c.a} ㎡ (含活动)</span>` : `${c.a} ㎡`;
+            
+            listHtml += `
+                <tr>
+                    <td>${label}</td>
+                    <td>${format(res.totalExp)}</td>
+                    <td>${format(res.subTotalOrig)}</td>
+                    <td>${format(res.subTotalNew)}</td>
+                    <td class="${totalDiff > 0 ? 'diff-plus' : (totalDiff < 0 ? 'diff-minus' : '')}">${totalDiff > 0 ? '+' : ''}${format(totalDiff)}</td>
+                    <td style="text-align:center">${advantage}</td>
+                </tr>
+            `;
+        });
+        document.getElementById('listBody').innerHTML = listHtml;
+        document.getElementById('resultContent').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
