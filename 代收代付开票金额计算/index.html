@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代收代付税差计算器</title>
+    <style>
+        :root {
+            --primary-color: #2563eb; /* 更商务的蓝色 */
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 520px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f9fafb;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 结果区域样式优化 */
+        .result-box {
+            background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .result-label {
+            font-size: 15px;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 40px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin: 10px 0;
+            font-family: 'Segoe UI', Roboto, sans-serif; /* 数字字体 */
+        }
+        
+        .diff-tag {
+            display: inline-block;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .diff-tag.green {
+             background-color: #d1fae5;
+             color: #047857;
+        }
+
+        /* 业务解释卡片 */
+        .explanation {
+            margin-top: 25px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        
+        .explanation strong {
+            color: #333;
+        }
+
+        .details-toggle {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .hidden-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 13px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #64748b;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>代收代付计算器</h1>
+    <div class="subtitle">我方开具 6% 专票场景</div>
+
+    <div class="input-group">
+        <label for="income">Step 1: 我方收到的金额 (含税)</label>
+        <input type="number" id="income" placeholder="请输入发票金额，例如：10800" oninput="calculate()">
+        <div class="helper-text">即我方给上游开具的 6% 专票面额</div>
+    </div>
+
+    <div class="input-group">
+        <label for="supplierRate">Step 2: 对方(收款方)能开什么票？</label>
+        <select id="supplierRate" onchange="calculate()">
+            <option value="0.06">开 6% 专票 (无税差)</option>
+            <option value="0.03">开 3% 专票 (需扣税差)</option>
+            <option value="0.01">开 1% 专票 (需扣税差)</option>
+            <option value="0">开 普票/不含税票 (需扣税差)</option>
+        </select>
+        <div class="helper-text">系统将自动计算由于税率不一致产生的成本并扣除</div>
+    </div>
+
+    <div class="result-box">
+        <div class="result-label">对方应开票/我方应转账金额</div>
+        <div class="result-value" id="finalAmount">0.00</div>
+        <div id="diffTag" class="diff-tag" style="display:none;"></div>
+    </div>
+
+    <div class="explanation">
+        <strong>💡 业务逻辑说明：</strong><br>
+        1. <strong>前提：</strong>这笔钱我们只是代收，不赚差价。但我方已按 6% 交了税。<br>
+        2. <strong>问题：</strong>如果对方开给我们的票税率低于 6%，我们能抵扣的税就少了，还要多交附加税。<br>
+        3. <strong>解决：</strong>为了不让我们公司“倒贴税钱”，必须把多出来的这部分税收成本，从给对方的转账金额里扣掉，保证公司净损益平衡。
+    </div>
+
+    <div class="details-toggle" onclick="toggleDetails()">查看详细税金测算 ▾</div>
+    
+    <div class="hidden-details" id="detailsBox">
+        <div class="detail-row">
+            <span>我方承担销项税 (6%):</span>
+            <span id="outputTax">0.00</span>
+        </div>
+        <div class="detail-row">
+            <span>对方提供进项抵扣:</span>
+            <span id="inputTax">0.00</span>
+        </div>
+        <div class="detail-row">
+            <span>我方需补缴附加税 (12%):</span>
+            <span id="surtax">0.00</span>
+        </div>
+        <div class="detail-row" style="margin-top:8px; border-top:1px solid #eee; padding-top:5px; font-weight:bold;">
+            <span>计算结果验证 (净收益):</span>
+            <span id="netCheck">0.00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const income = parseFloat(document.getElementById('income').value);
+        const supplierRate = parseFloat(document.getElementById('supplierRate').value);
+
+        if (isNaN(income) || income === 0) {
+            document.getElementById('finalAmount').innerText = "0.00";
+            document.getElementById('diffTag').style.display = "none";
+            document.getElementById('detailsBox').style.display = "none";
+            return;
+        }
+
+        // 常量定义
+        const myRate = 0.06;      // 我方销项税率
+        const surtaxRate = 0.12;  // 附加税率
+
+        // 计算公式：基于净现金流平衡
+        // 支付金额 = 收入 * 因子A * 因子B
+        const incomeFactor = (1 - myRate * surtaxRate) / (1 + myRate);
+        const expenseFactor = (1 + supplierRate) / (1 - supplierRate * surtaxRate);
+        const payment = income * incomeFactor * expenseFactor;
+
+        // 计算差额 (税差扣除金额)
+        const diff = income - payment;
+
+        // 更新主金额
+        document.getElementById('finalAmount').innerText = payment.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        // 更新差额标签
+        const diffTag = document.getElementById('diffTag');
+        if (Math.abs(diff) > 0.01) {
+            diffTag.style.display = "inline-block";
+            diffTag.className = "diff-tag"; // 红色背景
+            diffTag.innerText = `已扣除税差成本: ¥${diff.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        } else {
+            diffTag.style.display = "inline-block";
+            diffTag.className = "diff-tag green"; // 绿色背景
+            diffTag.innerText = "税负平衡，无额外扣款";
+        }
+
+        // --- 详细测算数据 ---
+        const outputTax = income / (1 + myRate) * myRate;
+        const inputTax = payment / (1 + supplierRate) * supplierRate;
+        
+        // 附加税逻辑：(销项-进项)*12%
+        // 注意：如果进项>销项，附加税通常为0，但在纯模型计算中我们保留数学值以展示平衡性
+        let vatPayable = outputTax - inputTax;
+        let surtax = vatPayable * surtaxRate;
+
+        // 验证净收益 (应该接近 0)
+        const revenueEx = income / (1 + myRate);
+        const costEx = payment / (1 + supplierRate);
+        const profit = revenueEx - costEx - surtax;
+        
+        document.getElementById('outputTax').innerText = outputTax.toFixed(2);
+        document.getElementById('inputTax').innerText = inputTax.toFixed(2);
+        document.getElementById('surtax').innerText = surtax.toFixed(2);
+        document.getElementById('netCheck').innerText = Math.abs(profit) < 0.01 ? "0.00 (平衡)" : profit.toFixed(2);
+    }
+
+    function toggleDetails() {
+        const details = document.getElementById('detailsBox');
+        if (details.style.display === "block") {
+            details.style.display = "none";
+        } else {
+            details.style.display = "block";
+            if(parseFloat(document.getElementById('income').value) > 0) calculate(); // 确保有数据
+        }
+    }
+</script>
+
+</body>
+</html>
