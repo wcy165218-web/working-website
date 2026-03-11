@@ -5,227 +5,218 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>福州渔博会补贴对比报告</title>
     <style>
-        /* 全局重置，防止边框撑开容器 */
         * { box-sizing: border-box; }
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --increase: #d32f2f;
-            --decrease: #2e7d32;
+            --primary: #1e293b;
+            --accent: #0284c7;
+            --increase: #dc2626;
+            --decrease: #16a34a;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+            --policy-bg: #eff6ff;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f7f9;
-            margin: 0;
-            padding: 8px; /* 极简边距 */
-            overflow-x: hidden; /* 绝对禁止横向滚动 */
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #f1f5f9;
+            margin: 0; padding: 10px; overflow-x: hidden; color: #334155;
         }
 
         .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            width: 100%; max-width: 800px; margin: 0 auto;
+            background: #fff; padding: 15px; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
-        h2 { font-size: 1.2rem; text-align: center; color: var(--primary); margin: 5px 0 15px 0; }
-        h3 { font-size: 0.95rem; border-left: 3px solid var(--accent); padding-left: 8px; margin: 20px 0 10px 0; }
+        h2 { font-size: 1.25rem; text-align: center; color: var(--primary); margin: 5px 0 15px 0; font-weight: 700; }
+        
+        .policy-box {
+            background-color: var(--policy-bg); border: 1px solid #bfdbfe;
+            border-radius: 8px; padding: 12px; margin-bottom: 20px;
+            font-size: 12px; line-height: 1.6; color: #1e40af;
+        }
+        .policy-tag {
+            display: inline-block; background: #2563eb; color: #fff;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold;
+            margin-bottom: 6px; font-size: 11px;
+        }
 
-        /* 输入面板：2列紧凑排版 */
+        h3 { font-size: 1rem; border-left: 4px solid var(--accent); padding-left: 10px; margin: 25px 0 12px 0; color: var(--primary); font-weight: 600; }
+
         .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            background: var(--bg-light); padding: 12px; border-radius: 8px; border: 1px solid var(--border);
         }
         .input-item { display: flex; flex-direction: column; }
-        label { font-size: 11px; color: #666; margin-bottom: 2px; }
+        label { font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 500; }
         input { 
-            width: 100%; 
-            padding: 8px; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-            font-size: 14px; 
-            outline: none;
+            width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; 
+            border-radius: 6px; font-size: 14px; outline: none;
         }
 
         .checkbox-row {
-            grid-column: 1 / -1;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            padding-top: 5px;
+            grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; 
+            padding: 10px; background: #fff; border-radius: 6px; border: 1px dashed #94a3b8;
         }
+        .checkbox-row label { 
+            display: flex; align-items: center; gap: 6px;
+            margin: 0; font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer; 
+        }
+        .checkbox-row input { width: auto; margin: 0; cursor: pointer; }
 
         button {
-            grid-column: 1 / -1;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 4px;
-            font-size: 15px;
-            font-weight: bold;
-            margin-top: 5px;
+            grid-column: 1 / -1; background: var(--accent); color: white; border: none;
+            padding: 14px; border-radius: 6px; font-size: 15px; font-weight: 600; margin-top: 5px; cursor: pointer;
         }
 
-        /* 表格通用：禁止换行，禁止溢出 */
-        table {
-            width: 100%;
-            table-layout: fixed; /* 强制平分屏幕 */
-            border-collapse: collapse;
-            margin-top: 5px;
-        }
-        th, td {
-            border: 1px solid #eee;
-            padding: 6px 2px; /* 极小内边距 */
-            font-size: 11px; /* 手机端超小字号以容纳内容 */
-            text-align: right;
-            white-space: nowrap; /* 绝对禁止换行 */
-            overflow: hidden;
-            text-overflow: ellipsis; /* 超出部分点点点（作为最后保险） */
-        }
-        th { background: #f8f9fa; color: #333; font-weight: bold; text-align: center; }
-        td:first-child { text-align: left; padding-left: 4px; }
+        .table-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #fff; }
+        table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+        th, td { padding: 10px 4px; font-size: 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg-light); color: #475569; font-weight: 600; text-align: center; font-size: 11px; }
+        td:first-child { text-align: left; padding-left: 10px; color: #475569; font-weight: 500; }
 
-        /* 针对明细表的特定比例 */
-        .detail-table th:nth-child(1), .detail-table td:nth-child(1) { width: 30%; }
-        .detail-table th { font-size: 11px; }
+        .row-group { background: #f8fafc; text-align: left; }
+        .row-group td { font-weight: 700; color: #64748b; font-size: 11px; padding-left: 10px; }
+        .final-row { background: #f0f9ff; font-weight: 700; }
 
-        /* 针对梯度表的特定比例：挤压次要信息 */
-        .list-table th:nth-child(1) { width: 18%; } /* 面积 */
-        .list-table th:nth-child(2) { width: 0; display: none; } /* 手机隐藏总支出列以腾空间 */
-        .list-table th:nth-child(3) { width: 22%; } /* 原补 */
-        .list-table th:nth-child(4) { width: 22%; } /* 现补 */
-        .list-table th:nth-child(5) { width: 20%; } /* 差异 */
-        .list-table th:nth-child(6) { width: 18%; } /* 优势 */
+        .list-table tr:nth-child(even) { background-color: #fafaf9; }
+        .list-table th:nth-child(2), .list-table td:nth-child(2) { display: none; } 
 
-        .list-table td:nth-child(2) { display: none; } /* 手机隐藏总支出列 */
-
-        .summary-box {
-            margin: 15px 0;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        /* 优势标签：极简化 */
-        .win-tag { font-size: 10px; padding: 1px 3px; border-radius: 2px; color: #fff; }
+        .summary-box { margin: 15px 0; padding: 15px; border-radius: 8px; text-align: center; font-size: 14px; font-weight: 700; }
+        .win-tag { font-size: 10px; padding: 2px 5px; border-radius: 4px; color: #fff; font-weight: 600; }
         .tag-new { background: var(--decrease); }
         .tag-old { background: var(--increase); }
-        .tag-none { background: #999; }
+        .diff-plus { color: var(--increase); font-weight: 700; }
+        .diff-minus { color: var(--decrease); font-weight: 700; }
 
-        .diff-plus { color: var(--increase); font-weight: bold; }
-        .diff-minus { color: var(--decrease); font-weight: bold; }
-
-        /* 电脑端恢复大字号和完整列 */
         @media (min-width: 600px) {
             body { padding: 20px; }
-            th, td { font-size: 13px; padding: 10px; }
+            th, td { font-size: 14px; padding: 12px 10px; }
             .list-table th:nth-child(2), .list-table td:nth-child(2) { display: table-cell; width: 18%; }
             .input-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
-            h2 { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>福州渔博会补贴对比</h2>
+    <h2>福州渔博会补贴对比测算</h2>
+
+    <div class="policy-box">
+        <span class="policy-tag">2026年补贴细则</span><br>
+        对参加在我市举办的国家级渔业展会的渔业经营主体按实际发生费用(展位费、特装费、推介会等)的50%给予补助，每家企业最高补助不超过5万元，对组织开展主题活动的再给予最高奖励10万元(不超过实际投资金额)，每家企业累计不超过15万元。
+    </div>
     
     <div class="input-grid">
-        <div class="input-item"><label>展位费(元/㎡)</label><input type="number" id="pb" value="580"></div>
-        <div class="input-item"><label>搭建费(元/㎡)</label><input type="number" id="pc" value="1000"></div>
-        <div class="input-item"><label>测算面积(㎡)</label><input type="number" id="ar" value="180"></div>
-        <div class="input-item"><label>活动成本(元)</label><input type="number" id="tc" value="100000"></div>
+        <div class="input-item"><label>展位费 (元/㎡)</label><input type="number" id="pb" value="580"></div>
+        <div class="input-item"><label>搭建费 (元/㎡)</label><input type="number" id="pc" value="1000"></div>
+        <div class="input-item"><label>测算面积 (㎡)</label><input type="number" id="ar" value="180"></div>
+        <div class="input-item"><label>活动成本 (元)</label><input type="number" id="tc" value="100000"></div>
+        
         <div class="checkbox-row">
-            <input type="checkbox" id="wt" checked> <label for="wt">办主题活动(≥180㎡)</label>
+            <label>
+                <input type="checkbox" id="wt" checked> 是否举办主题活动 (≥180㎡)
+            </label>
         </div>
-        <button onclick="run()">立即对比分析报告</button>
+        
+        <button onclick="run()">立即生成对比报告</button>
     </div>
 
     <div id="res" style="display:none;">
         <div id="vb" class="summary-box"></div>
 
         <h3>1. 费用支出明细表</h3>
-        <table class="detail-table">
-            <thead>
-                <tr><th>明细项目</th><th>原方案</th><th>现方案</th><th>差额</th></tr>
-            </thead>
-            <tbody id="db"></tbody>
-        </table>
+        <div class="table-card">
+            <table class="detail-table">
+                <thead>
+                    <tr><th>明细项目</th><th>原方案</th><th>现方案</th><th>差额</th></tr>
+                </thead>
+                <tbody id="db"></tbody>
+            </table>
+        </div>
 
-        <h3>2. 多梯度面积对比 (PC显示全列)</h3>
-        <table class="list-table">
-            <thead>
-                <tr>
-                    <th>面积</th>
-                    <th>总支出</th>
-                    <th id="th-old">原补贴</th>
-                    <th id="th-new">现补贴</th>
-                    <th>差异</th>
-                    <th>优势</th>
-                </tr>
-            </thead>
-            <tbody id="lb"></tbody>
-        </table>
+        <h3>2. 多梯度面积对比</h3>
+        <div class="table-card">
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th>面积</th>
+                        <th>总支出</th>
+                        <th>原补贴</th>
+                        <th>现补贴</th>
+                        <th>差异</th>
+                        <th style="text-align:center;">优势</th>
+                    </tr>
+                </thead>
+                <tbody id="lb"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    const f = n => Math.round(n).toLocaleString();
+    // 格式化数字
+    const f = (n) => Math.round(n).toLocaleString('zh-CN');
 
+    // 计算逻辑
     function calc(pb, pc, a, tc, want) {
-        const base = (pb + pc) * a;
+        const costB = pb * a;
+        const costC = pc * a;
         const isT = (a >= 180 && want);
-        const sO = Math.min((a / 9) * 5000, 100000) + (isT ? 100000 : 0);
-        const sN = Math.min(base * 0.5, 50000) + (isT ? 100000 : 0);
-        const total = base + (isT ? tc : 0);
-        return { total, sO, sN, fO: total - sO, fN: total - sN };
+        const actC = isT ? tc : 0;
+        const total = costB + costC + actC;
+        
+        // 原方案：每9平米补5000元，封顶10万；活动再补10万
+        const sBO = Math.min((a / 9) * 5000, 100000) + (isT ? 100000 : 0);
+        
+        // 现方案：实际费用50%，封顶5万；活动最高奖10万(不超成本)；累计封顶15万
+        let baseSubNew = Math.min((costB + costC) * 0.5, 50000);
+        let themeSubNew = isT ? Math.min(actC, 100000) : 0;
+        const sN = Math.min(baseSubNew + themeSubNew, 150000);
+        
+        return { costB, costC, actC, total, sO: sBO, sN: sN, fO: total - sBO, fN: total - sN };
     }
 
     function run() {
-        const pb = +document.getElementById('pb').value, pc = +document.getElementById('pc').value;
-        const ar = +document.getElementById('ar').value, tc = +document.getElementById('tc').value;
+        const pb = parseFloat(document.getElementById('pb').value) || 0;
+        const pc = parseFloat(document.getElementById('pc').value) || 0;
+        const ar = parseFloat(document.getElementById('ar').value) || 0;
+        const tc = parseFloat(document.getElementById('tc').value) || 0;
         const wt = document.getElementById('wt').checked;
 
         const d = calc(pb, pc, ar, tc, wt);
         
-        // 明细：为了空间，合并了支出项
+        // 渲染明细
         document.getElementById('db').innerHTML = `
-            <tr><td>基准支出</td><td>${f(pb*ar+pc*ar)}</td><td>${f(pb*ar+pc*ar)}</td><td>-</td></tr>
-            <tr><td>活动成本</td><td>${f(d.total-(pb*ar+pc*ar))}</td><td>${f(d.total-(pb*ar+pc*ar))}</td><td>-</td></tr>
-            <tr><td>合计补贴</td><td>${f(d.sO)}</td><td>${f(d.sN)}</td><td class="${d.sN<d.sO?'diff-plus':''}">${f(d.sN-d.sO)}</td></tr>
-            <tr style="background:#f0f7ff; font-weight:bold;"><td>最终实付</td><td>${f(d.fO)}</td><td>${f(d.fN)}</td><td class="${d.fN>d.fO?'diff-plus':'diff-minus'}">${f(d.fN-d.fO)}</td></tr>
+            <tr class="row-group"><td colspan="4">一、 支出核算</td></tr>
+            <tr><td>展位费支出</td><td>${f(d.costB)}</td><td>${f(d.costB)}</td><td>-</td></tr>
+            <tr><td>搭建费支出</td><td>${f(d.costC)}</td><td>${f(d.costC)}</td><td>-</td></tr>
+            <tr><td>主题活动成本</td><td>${f(d.actC)}</td><td>${f(d.actC)}</td><td>-</td></tr>
+            <tr class="row-group"><td colspan="4">二、 补贴核算</td></tr>
+            <tr><td>预计补贴总额</td><td>${f(d.sO)}</td><td>${f(d.sN)}</td><td class="${d.sN < d.sO ? 'diff-plus' : ''}">${f(d.sN - d.sO)}</td></tr>
+            <tr class="final-row"><td>企业最终实付</td><td>${f(d.fO)}</td><td>${f(d.fN)}</td><td class="${d.fN > d.fO ? 'diff-plus' : 'diff-minus'}">${f(d.fN - d.fO)}</td></tr>
         `;
 
-        const vb = document.getElementById('vb'), df = d.fN - d.fO;
-        vb.style.background = df > 0 ? "#fff1f0" : (df < 0 ? "#f6ffed" : "#f5f5f5");
-        vb.style.color = df > 0 ? "#cf1322" : (df < 0 ? "#389e0d" : "#666");
-        vb.innerHTML = df > 0 ? `⚠️ 原方案更优 (差¥${f(df)})` : (df < 0 ? `✅ 现方案更优 (省¥${f(Math.abs(df))})` : "支出完全一致");
+        // 渲染提示框
+        const vb = document.getElementById('vb');
+        const df = d.fN - d.fO;
+        vb.style.background = df > 0 ? "#fef2f2" : (df < 0 ? "#f0fdf4" : "#f8fafc");
+        vb.style.color = df > 0 ? "#b91c1c" : (df < 0 ? "#15803d" : "#475569");
+        vb.innerHTML = df > 0 ? `⚠️ 原方案更优 (现方案多出 ¥${f(df)})` : (df < 0 ? `✅ 现方案更优 (可省下 ¥${f(Math.abs(df))})` : "支出完全一致");
 
-        // 梯度列表：手机端会自动隐藏“总支出”列
+        // 渲染梯度列表
         const confs = [{a:36,t:0},{a:54,t:0},{a:72,t:0},{a:81,t:0},{a:90,t:0},{a:108,t:0},{a:135,t:0},{a:180,t:0},{a:180,t:1}];
         let lHtml = "";
         confs.forEach(c => {
             const r = calc(pb, pc, c.a, tc, c.t);
             const dff = r.fN - r.fO;
-            const tag = dff < 0 ? '<span class="win-tag tag-new">现</span>' : (dff > 0 ? '<span class="win-tag tag-old">原</span>' : '<span class="win-tag tag-none">无</span>');
+            const tag = dff < 0 ? '<span class="win-tag tag-new">现</span>' : (dff > 0 ? '<span class="win-tag tag-old">原</span>' : '<span class="win-tag" style="background:#94a3b8">无</span>');
             lHtml += `<tr>
-                <td>${c.a}${c.t?'*':''}㎡</td>
+                <td>${c.a}${c.t ? '*' : ''}㎡</td>
                 <td>${f(r.total)}</td>
                 <td>${f(r.sO)}</td>
                 <td>${f(r.sN)}</td>
-                <td class="${dff>0?'diff-plus':(dff<0?'diff-minus':'')}">${dff>0?'+':''}${f(dff)}</td>
+                <td class="${dff > 0 ? 'diff-plus' : (dff < 0 ? 'diff-minus' : '')}">${dff > 0 ? '+' : ''}${f(dff)}</td>
                 <td style="text-align:center">${tag}</td>
             </tr>`;
         });
